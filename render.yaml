@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: sentinel-demo
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
