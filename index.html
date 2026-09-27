@@ -38,7 +38,7 @@
   a{color:inherit;}
   button,input,select,textarea{font-family:inherit; font-size:inherit; color:inherit;}
 
-  .app{max-width:1160px; margin:0 auto; display:flex; flex-direction:column; gap:16px;}
+  .app{max-width:1560px; margin:0 auto; display:flex; flex-direction:column; gap:16px;}
   header.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
   .brand{display:flex; align-items:center; gap:10px;}
   .brand .mark{width:34px; height:34px; border-radius:9px; background:linear-gradient(155deg,var(--accent),#5c2318); display:flex; align-items:center; justify-content:center; color:#fff; font-family:"Source Serif 4",serif; font-weight:700; font-size:16px; flex:none;}
@@ -49,7 +49,7 @@
   .notice .ico{flex:none; font-size:16px; line-height:1;}
   .notice strong{color:var(--ink);}
 
-  .layout{display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start;}
+  .layout{display:grid; grid-template-columns:0.85fr 1.15fr; gap:18px; align-items:start;}
   .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow);}
   .card-head{padding:15px 18px; border-bottom:1px solid var(--line);}
   .card-head h2{font-size:16px;}
@@ -64,6 +64,7 @@
   .brand-opt input{position:absolute; opacity:0; pointer-events:none;}
 
   .row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .row3{display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:12px;}
   label{display:flex; flex-direction:column; gap:5px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.03em; font-weight:600;}
   input, select, textarea{
     border:1px solid var(--line); background:var(--surface); border-radius:8px; padding:9px 10px; font-size:13.5px; color:var(--ink); text-transform:none; font-weight:400; letter-spacing:0;
@@ -73,7 +74,8 @@
 
   .stat-list{display:flex; flex-direction:column; gap:8px;}
   .stat-row{display:grid; grid-template-columns:1fr 1fr auto; gap:8px; align-items:center;}
-  .stat-row input{margin:0;}
+  .hl-row{display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center;}
+  .stat-row input, .hl-row input{margin:0;}
   .icon-btn{border:1px solid var(--line); background:var(--surface); border-radius:8px; width:34px; height:34px; cursor:pointer; font-size:15px; line-height:1; flex:none;}
   .icon-btn:hover{border-color:var(--accent);}
   .add-row{align-self:flex-start; font-size:12.5px; font-weight:600; color:var(--accent); background:none; border:none; cursor:pointer; padding:0;}
@@ -82,13 +84,13 @@
   .btn:hover{opacity:0.92;}
 
   .preview-wrap{padding:16px 18px; display:flex; flex-direction:column; gap:10px;}
-  .preview-frame{border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface-2); aspect-ratio:8.5/11; width:100%;}
+  .preview-frame{border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface-2); aspect-ratio:8.5/11; width:100%; max-width:620px; margin:0 auto;}
   .preview-frame iframe{width:100%; height:100%; border:none; display:block;}
   .preview-hint{font-size:12px; color:var(--faint); text-align:center;}
 
-  @media (max-width:900px){
+  @media (max-width:980px){
     .layout{grid-template-columns:1fr;}
-    .row{grid-template-columns:1fr;}
+    .row, .row3{grid-template-columns:1fr;}
     .brand-picker{grid-template-columns:1fr 1fr 1fr;}
   }
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
@@ -102,7 +104,7 @@
 
   <div class="notice">
     <span class="ico">&#128196;</span>
-    <div><strong>The point isn't fraud, or reports specifically &mdash; it's the engine underneath.</strong> Sentinel's real job at work is turning raw, structured data into a properly formatted, print-ready PDF on demand. This mini demo proves that by doing something sillier than any real use case: the exact same data, rendered through three completely different "brands." Change the data once, or change the brand once &mdash; either way, a real PDF comes out the other side.</div>
+    <div><strong>The point isn't fraud, or reports specifically &mdash; it's the engine underneath.</strong> Sentinel's real job at work is turning raw, structured data into a properly formatted, print-ready PDF on demand, and the real thing does far more layout work than a stat list. This demo gives a glimpse of that: tables, checklists, classification marks, redaction &mdash; rendered three structurally different ways from the exact same data.</div>
   </div>
 
   <div class="layout">
@@ -135,10 +137,28 @@
           <label>Prepared for<input id="preparedFor" type="text" value="Leadership Team" /></label>
         </div>
 
+        <div class="row3">
+          <label>Reference code<input id="referenceCode" type="text" value="DOC-2026-0417" /></label>
+          <label>Classification
+            <select id="classification">
+              <option>Internal Use</option>
+              <option selected>Confidential</option>
+              <option>Restricted</option>
+            </select>
+          </label>
+          <label>Date<input id="docDate" type="text" value="Sept 2026" /></label>
+        </div>
+
         <div>
           <label style="margin-bottom:8px;">Data points (label / value)</label>
           <div class="stat-list" id="statList"></div>
           <button class="add-row" id="btnAddRow" type="button">+ Add data point</button>
+        </div>
+
+        <div>
+          <label style="margin-bottom:8px;">Highlights</label>
+          <div class="stat-list" id="hlList"></div>
+          <button class="add-row" id="btnAddHl" type="button">+ Add highlight</button>
         </div>
 
         <label>Notes<textarea id="notes" rows="3">Placeholder narrative — any free text goes here, regardless of which brand renders it.</textarea></label>
@@ -165,6 +185,12 @@
     ["Regions live", "12"],
     ["Adoption", "87%"],
     ["Open issues", "3"],
+    ["Owner", "Platform team"],
+  ];
+  var DEFAULT_HIGHLIGHTS = [
+    "Rollout completed a week ahead of schedule across every live region.",
+    "Two regions still reporting elevated error rates post-launch.",
+    "Support load returned to baseline within 48 hours.",
   ];
 
   function addStatRow(label, value){
@@ -178,12 +204,22 @@
     row.querySelector(".icon-btn").addEventListener("click", function(){ row.remove(); });
     list.appendChild(row);
   }
+  function addHlRow(text){
+    var list = document.getElementById("hlList");
+    var row = document.createElement("div");
+    row.className = "hl-row";
+    row.innerHTML =
+      '<input type="text" class="hl-text" value="' + text.replace(/"/g,"&quot;") + '" placeholder="Highlight" />' +
+      '<button type="button" class="icon-btn" aria-label="Remove highlight">&times;</button>';
+    row.querySelector(".icon-btn").addEventListener("click", function(){ row.remove(); });
+    list.appendChild(row);
+  }
 
   DEFAULT_STATS.forEach(function(s){ addStatRow(s[0], s[1]); });
+  DEFAULT_HIGHLIGHTS.forEach(function(h){ addHlRow(h); });
 
-  document.getElementById("btnAddRow").addEventListener("click", function(){
-    addStatRow("", "");
-  });
+  document.getElementById("btnAddRow").addEventListener("click", function(){ addStatRow("", ""); });
+  document.getElementById("btnAddHl").addEventListener("click", function(){ addHlRow(""); });
 
   document.getElementById("brandPicker").addEventListener("click", function(e){
     var opt = e.target.closest(".brand-opt");
@@ -207,159 +243,353 @@
     });
     return out;
   }
+  function collectHighlights(){
+    var rows = document.querySelectorAll("#hlList .hl-text");
+    var out = [];
+    rows.forEach(function(r){ var v = r.value.trim(); if(v) out.push(v); });
+    return out;
+  }
 
   function wrapLines(doc, text, maxWidth){
     return doc.splitTextToSize(text, maxWidth);
   }
 
-  // ---- Brand templates: same data in, wildly different PDF out ----
+  // ==== Shared small-shape helpers (kept to primitives jsPDF supports
+  //      natively — rect/circle/triangle/line — nothing hand-rolled from
+  //      raw path coordinates, so nothing here can render mangled). ====
+
+  function checkbox(doc, x, y, size, strokeColor){
+    doc.setDrawColor.apply(doc, strokeColor);
+    doc.setLineWidth(1);
+    doc.rect(x, y - size, size, size);
+    doc.line(x + size*0.2, y - size*0.45, x + size*0.45, y - size*0.15);
+    doc.line(x + size*0.45, y - size*0.15, x + size*0.85, y - size*0.8);
+  }
+
+  function sparkle(doc, cx, cy, r, color){
+    doc.setFillColor.apply(doc, color);
+    doc.circle(cx, cy, r, "F");
+    doc.circle(cx - r*1.8, cy, r*0.5, "F");
+    doc.circle(cx + r*1.8, cy, r*0.5, "F");
+  }
+
+  function heart(doc, cx, cy, r, color){
+    doc.setFillColor.apply(doc, color);
+    doc.circle(cx - r*0.55, cy - r*0.3, r*0.65, "F");
+    doc.circle(cx + r*0.55, cy - r*0.3, r*0.65, "F");
+    doc.triangle(cx - r*1.15, cy - r*0.15, cx + r*1.15, cy - r*0.15, cx, cy + r*1.1, "F");
+  }
+
+  function ribbon(doc, x, y, w, h, fill, textColor, label){
+    var tail = h * 0.55;
+    doc.setFillColor.apply(doc, fill);
+    doc.rect(x, y, w, h, "F");
+    doc.triangle(x, y + h, x + tail, y + h, x, y + h + tail, "F");
+    doc.triangle(x + w, y + h, x + w - tail, y + h, x + w, y + h + tail, "F");
+    doc.setTextColor.apply(doc, textColor);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.text(label, x + w / 2, y + h / 2 + 3, { align: "center" });
+  }
+
+  function barcode(doc, x, y, w, h, color){
+    doc.setFillColor.apply(doc, color);
+    var cursor = x, seed = 17;
+    while (cursor < x + w) {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      var bw = 1 + (seed % 3);
+      if (seed % 5 !== 0) doc.rect(cursor, y, bw, h, "F");
+      cursor += bw + 1.4;
+    }
+  }
+
+  /** Redacts the trailing `fraction` of a rendered line, measured for real
+   *  via getTextWidth — so the bar always lands exactly on the text, never
+   *  guessed. */
+  function redactTail(doc, text, x, y, fontSize, fraction, barColor){
+    var full = doc.getTextWidth(text);
+    var redactW = full * fraction;
+    doc.setFillColor.apply(doc, barColor);
+    doc.rect(x + (full - redactW), y - fontSize * 0.78, redactW, fontSize * 0.95, "F");
+  }
+
+  // ==== Brand templates: same data in, structurally different PDF out ====
 
   function renderStandard(doc, data){
     var pageW = doc.internal.pageSize.getWidth();
+    var pageH = doc.internal.pageSize.getHeight();
     var margin = 54;
     var contentW = pageW - margin * 2;
-    var y = margin;
 
+    // Page frame
+    doc.setDrawColor(210, 208, 200);
+    doc.setLineWidth(0.75);
+    doc.rect(24, 24, pageW - 48, pageH - 48);
+
+    // Header band
     doc.setFillColor(27, 36, 48);
-    doc.rect(0, 0, pageW, 70, "F");
-    doc.setTextColor(255,255,255);
+    doc.rect(24, 24, pageW - 48, 76, "F");
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.6);
+    doc.circle(margin + 8, 60, 9);
+    doc.circle(margin + 8, 60, 4);
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.text(data.title, margin, 42);
+    doc.setFontSize(17);
+    doc.text(data.title, margin + 28, 55);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text("Prepared for " + data.preparedFor, margin, 58);
-
-    y = 100;
-    doc.setTextColor(20,20,20);
+    doc.setFontSize(9.5);
+    doc.text("Prepared for " + data.preparedFor + "  ·  " + data.docDate, margin + 28, 70);
+    doc.setFont("courier", "normal");
+    doc.setFontSize(8.5);
+    doc.text(data.reference, pageW - margin, 46, { align: "right" });
+    doc.setFillColor(214, 168, 96);
+    doc.roundedRect(pageW - margin - 78, 54, 78, 14, 3, 3, "F");
+    doc.setTextColor(40, 28, 8);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.text("KEY FIGURES", margin, y);
-    y += 18;
-    doc.setDrawColor(220,220,220);
-    data.stats.forEach(function(s){
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.text(s[0], margin, y);
-      doc.setFont("helvetica", "bold");
-      doc.text(s[1], pageW - margin, y, { align: "right" });
-      y += 14;
-      doc.line(margin, y - 9, pageW - margin, y - 9);
-    });
-    y += 16;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.text("NOTES", margin, y);
-    y += 16;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    wrapLines(doc, data.notes, contentW).forEach(function(line){ doc.text(line, margin, y); y += 14; });
+    doc.setFontSize(7.5);
+    doc.text(data.classification.toUpperCase(), pageW - margin - 39, 63.5, { align: "center" });
 
+    var colGap = 22;
+    var leftW = contentW * 0.56;
+    var rightW = contentW - leftW - colGap;
+    var leftX = margin, rightX = margin + leftW + colGap;
+    var y = 128;
+
+    doc.setTextColor(20, 20, 20);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.text("KEY FIGURES", leftX, y);
+    y += 10;
+    doc.setDrawColor(220, 220, 220);
+
+    var rowH = 20, tableTop = y + 6;
+    doc.setFillColor(27, 36, 48);
+    doc.rect(leftX, tableTop, leftW, 16, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
-    doc.setTextColor(150,150,150);
-    doc.text("Generated by Sentinel (demo) — standard brand", margin, doc.internal.pageSize.getHeight() - 30);
+    doc.text("METRIC", leftX + 8, tableTop + 11);
+    doc.text("VALUE", leftX + leftW - 8, tableTop + 11, { align: "right" });
+
+    var ty = tableTop + 16;
+    data.stats.forEach(function(s, i){
+      if (i % 2 === 0){ doc.setFillColor(244, 243, 239); doc.rect(leftX, ty, leftW, rowH, "F"); }
+      doc.setTextColor(40, 40, 40);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.text(String(s[0]), leftX + 8, ty + 13.5);
+      doc.setFont("helvetica", "bold");
+      doc.text(String(s[1]), leftX + leftW - 8, ty + 13.5, { align: "right" });
+      ty += rowH;
+    });
+    doc.setDrawColor(200, 198, 190);
+    doc.rect(leftX, tableTop, leftW, ty - tableTop);
+
+    var hy = y;
+    doc.setTextColor(20, 20, 20);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.text("HIGHLIGHTS", rightX, hy);
+    hy += 22;
+    data.highlights.forEach(function(h){
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      var lines = wrapLines(doc, h, rightW - 16);
+      checkbox(doc, rightX, hy, 8, [90, 90, 90]);
+      doc.setTextColor(50, 50, 50);
+      lines.forEach(function(line, li){ doc.text(line, rightX + 14, hy + li * 11); });
+      hy += Math.max(18, lines.length * 11 + 7);
+    });
+
+    var bodyBottom = Math.max(ty, hy) + 14;
+    doc.setDrawColor(220, 220, 220);
+    doc.line(margin, bodyBottom, pageW - margin, bodyBottom);
+    bodyBottom += 16;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(20, 20, 20);
+    doc.text("NOTES", margin, bodyBottom);
+    bodyBottom += 14;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(60, 60, 60);
+    wrapLines(doc, data.notes, contentW).forEach(function(line){ doc.text(line, margin, bodyBottom); bodyBottom += 13; });
+
+    doc.setFont("courier", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(140, 140, 140);
+    doc.text(data.reference + "  ·  generated by Sentinel (demo)", margin, pageH - 34);
+    doc.text("Page 1 of 1", pageW - margin, pageH - 34, { align: "right" });
   }
 
   function renderBarbie(doc, data){
     var pageW = doc.internal.pageSize.getWidth();
     var pageH = doc.internal.pageSize.getHeight();
-    var margin = 50;
-    var y = 0;
+    var margin = 46;
 
     doc.setFillColor(255, 95, 162);
     doc.rect(0, 0, pageW, pageH, "F");
+    // drop-shadow illusion: darker pink rect offset behind the white card
+    doc.setFillColor(219, 39, 119);
+    doc.roundedRect(28, 28, pageW - 48, pageH - 48, 18, 18, "F");
     doc.setFillColor(255, 255, 255);
     doc.roundedRect(24, 24, pageW - 48, pageH - 48, 18, 18, "F");
 
-    y = 70;
+    ribbon(doc, pageW - 150, 44, 104, 20, [255, 209, 230], [157, 23, 79], data.classification.toUpperCase() + "-ISH");
+
+    var y = 76;
     doc.setTextColor(219, 39, 119);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(24);
-    doc.text(String(data.title).toUpperCase() + " *", margin, y);
-    doc.setFontSize(11);
+    doc.setFontSize(23);
+    doc.text(String(data.title).toUpperCase(), margin, y);
+    sparkle(doc, margin + doc.getTextWidth(String(data.title).toUpperCase()) + 16, y - 6, 2.2, [255, 209, 230]);
+    doc.setFontSize(10.5);
     doc.setFont("helvetica", "normal");
-    doc.text("A fabulous update for " + data.preparedFor, margin, y + 18);
+    doc.text("A fabulous update for " + data.preparedFor + "  ·  " + data.docDate, margin, y + 17);
+    doc.setFont("courier", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(219, 39, 119);
+    doc.text(data.reference, margin, y + 30);
 
-    y += 46;
+    y += 52;
     data.stats.forEach(function(s){
       doc.setFillColor(255, 209, 230);
-      doc.roundedRect(margin, y - 12, pageW - margin * 2, 26, 13, 13, "F");
+      doc.roundedRect(margin, y - 12, pageW - margin * 2, 25, 12.5, 12.5, "F");
+      heart(doc, margin + 15, y, 4, [219, 39, 119]);
       doc.setTextColor(157, 23, 77);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.text("* " + s[0], margin + 12, y + 5);
-      doc.text(s[1], pageW - margin - 12, y + 5, { align: "right" });
-      y += 34;
+      doc.setFontSize(9.5);
+      doc.text(String(s[0]), margin + 27, y + 4);
+      doc.text(String(s[1]), pageW - margin - 12, y + 4, { align: "right" });
+      y += 32;
     });
 
-    y += 12;
+    y += 8;
+    doc.setTextColor(219, 39, 119);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("XOXO, HIGHLIGHTS", margin, y);
+    y += 15;
+    data.highlights.forEach(function(h){
+      sparkle(doc, margin + 5, y - 3, 2, [255, 105, 180]);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.setTextColor(120, 40, 80);
+      var lines = wrapLines(doc, h, pageW - margin * 2 - 24);
+      lines.forEach(function(line, li){ doc.text(line, margin + 16, y + li * 12); });
+      y += Math.max(15, lines.length * 12 + 4);
+    });
+
+    y += 8;
     doc.setTextColor(219, 39, 119);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.text("XOXO, NOTES", margin, y);
-    y += 16;
+    y += 15;
     doc.setTextColor(80, 30, 55);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    wrapLines(doc, data.notes, pageW - margin * 2).forEach(function(line){ doc.text(line, margin, y); y += 14; });
+    doc.setFontSize(9.5);
+    wrapLines(doc, data.notes, pageW - margin * 2).forEach(function(line){ doc.text(line, margin, y); y += 13; });
 
+    var dotsY = pageH - 52;
+    for (var dx = margin; dx < pageW - margin; dx += 14) {
+      doc.setFillColor(255, 182, 213);
+      doc.circle(dx, dotsY, 2, "F");
+    }
     doc.setFontSize(8);
     doc.setTextColor(219, 39, 119);
-    doc.text("Generated by Sentinel (demo) — barbie brand, obviously", margin, pageH - 40);
+    doc.text("Generated by Sentinel (demo) — barbie brand, obviously", margin, pageH - 36);
   }
 
   function renderOppenheimer(doc, data){
     var pageW = doc.internal.pageSize.getWidth();
     var pageH = doc.internal.pageSize.getHeight();
     var margin = 54;
-    var y = 0;
 
     doc.setFillColor(10, 10, 10);
     doc.rect(0, 0, pageW, pageH, "F");
-    doc.setDrawColor(255,255,255);
+
+    // faint technical grid
+    doc.setDrawColor(30, 30, 30);
+    doc.setLineWidth(0.3);
+    for (var gx = 24; gx < pageW - 24; gx += 24) doc.line(gx, 24, gx, pageH - 24);
+    for (var gy = 24; gy < pageH - 24; gy += 24) doc.line(24, gy, pageW - 24, gy);
+
+    doc.setDrawColor(255, 255, 255);
     doc.setLineWidth(1.2);
     doc.rect(20, 20, pageW - 40, pageH - 40);
 
-    doc.setTextColor(255,255,255);
+    // rotated watermark, behind everything else drawn after it
+    doc.setTextColor(38, 38, 38);
+    doc.setFont("courier", "bold");
+    doc.setFontSize(64);
+    doc.text("EYES ONLY", pageW / 2, pageH / 2, { align: "center", angle: 28 });
+
+    doc.setTextColor(255, 255, 255);
     doc.setFont("courier", "bold");
     doc.setFontSize(9);
     doc.text("DECLASSIFIED // FOR DEMONSTRATION ONLY", margin, 46);
-    doc.setLineWidth(0.6);
+    doc.text("[ " + data.classification.toUpperCase() + " ]", pageW - margin, 46, { align: "right" });
+    doc.setLineWidth(0.8);
     doc.line(margin, 52, pageW - margin, 52);
+    doc.setLineWidth(0.4);
+    doc.line(margin, 55, pageW - margin, 55);
 
-    y = 82;
+    var y = 84;
     doc.setFont("courier", "bold");
-    doc.setFontSize(20);
+    doc.setFontSize(19);
     doc.text(String(data.title).toUpperCase(), margin, y);
     doc.setFont("courier", "normal");
-    doc.setFontSize(10);
-    doc.text("PREPARED FOR: " + String(data.preparedFor).toUpperCase(), margin, y + 20);
+    doc.setFontSize(9.5);
+    doc.text("PREPARED FOR: " + String(data.preparedFor).toUpperCase() + "   DATE: " + String(data.docDate).toUpperCase(), margin, y + 18);
+    doc.text("REF: " + data.reference, margin, y + 32);
 
-    y += 48;
+    y += 60;
     doc.setFont("courier", "bold");
     doc.setFontSize(10);
     doc.text("[ DATA ]", margin, y);
-    y += 16;
+    y += 15;
     data.stats.forEach(function(s){
       doc.setFont("courier", "normal");
-      doc.setFontSize(10);
-      doc.text(">> " + s[0].toUpperCase(), margin, y);
+      doc.setFontSize(9.5);
+      doc.text(">> " + String(s[0]).toUpperCase(), margin, y);
       doc.text(String(s[1]).toUpperCase(), pageW - margin, y, { align: "right" });
-      y += 15;
+      y += 14;
     });
 
-    y += 14;
+    y += 12;
     doc.setFont("courier", "bold");
-    doc.text("[ NOTES ]", margin, y);
-    y += 16;
-    doc.setFont("courier", "normal");
     doc.setFontSize(10);
-    wrapLines(doc, data.notes, pageW - margin * 2).forEach(function(line){ doc.text(line, margin, y); y += 14; });
+    doc.text("[ FIELD NOTES ]", margin, y);
+    y += 15;
+    data.highlights.forEach(function(h, hi){
+      var line = "// " + h;
+      doc.setFont("courier", "normal");
+      doc.setFontSize(9.5);
+      var lines = wrapLines(doc, line, pageW - margin * 2);
+      lines.forEach(function(l, li){ doc.text(l, margin, y + li * 13); });
+      // redact the tail of the first wrapped line on alternating entries —
+      // width is measured for real, never guessed, so it always lands on the text
+      if (hi % 2 === 1) redactTail(doc, lines[0], margin, y, 9.5, 0.4, [230, 230, 230]);
+      y += lines.length * 13 + 6;
+    });
 
+    y += 10;
+    doc.setFont("courier", "bold");
+    doc.setFontSize(10);
+    doc.text("[ NOTES ]", margin, y);
+    y += 15;
     doc.setFont("courier", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(150,150,150);
-    doc.text("Generated by Sentinel (demo) — oppenheimer brand", margin, pageH - 40);
+    doc.setFontSize(9.5);
+    wrapLines(doc, data.notes, pageW - margin * 2).forEach(function(line){ doc.text(line, margin, y); y += 13; });
+
+    barcode(doc, margin, pageH - 46, 130, 20, [255, 255, 255]);
+    doc.setFont("courier", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(150, 150, 150);
+    doc.text(data.reference, margin, pageH - 22);
+    doc.text("PAGE 1 OF 1 // GENERATED BY SENTINEL (DEMO)", pageW - margin, pageH - 22, { align: "right" });
   }
 
   function generate(){
@@ -369,7 +599,11 @@
     var data = {
       title: document.getElementById("reportTitle").value || "Untitled",
       preparedFor: document.getElementById("preparedFor").value || "—",
+      reference: document.getElementById("referenceCode").value || "—",
+      classification: document.getElementById("classification").value || "Internal Use",
+      docDate: document.getElementById("docDate").value || "—",
       stats: collectStats(),
+      highlights: collectHighlights(),
       notes: document.getElementById("notes").value || "",
     };
 

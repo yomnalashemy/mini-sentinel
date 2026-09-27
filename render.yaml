@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: sentinel-demo
+    name: mini-sentinel
     runtime: static
     buildCommand: ""
     staticPublishPath: .
